@@ -1,0 +1,25 @@
+import pandas as pd;
+df = pd.read_csv(r"C:\Users\Indhumathi Gunasekar\OneDrive\Desktop\order-items.csv");
+#pd.set_option('display.max_rows', 500)
+
+#df.info()
+#df.describe()
+#df['product_sku'].value_counts()
+df = df.fillna(0)
+df['gross_price'].astype(float)
+
+Total = df['gross_price'].sum()
+Mean = df['gross_price'].mean()
+Max = df['gross_price'].max()
+Min = df['gross_price'].min()
+print('Sum : {0} \nMean: {1} \nMinimum: {2}\nMaximum: {3}'.format(Total,Mean, Min,Max))
+
+pd.set_option('display.max_columns', None) #display all columns
+
+pd.to_datetime(df['shipment_requested_delivery_date'])
+df.head(10)
+df.plot.bar(x='shipment_requested_delivery_date', y='gross_price', rot=90, figsize=(5,5))
+
+daily_orders = df.groupby('shipment_requested_delivery_date').sum()['gross_price']
+daily_orders.head()
+daily_orders.plot.bar(x='shipment_requested_delivery_date', y='gross_price', rot=90, figsize=(5,5))
