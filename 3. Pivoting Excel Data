@@ -1,0 +1,34 @@
+#dataset - https://www.kaggle.com/datasets/aungpyaeap/supermarket-sales
+
+import pandas as pd
+import openpyxl
+from openpyxl import load_workbook
+from openpyxl.styles import Font
+from openpyxl.chart import BarChart, Reference
+import string
+
+excel_file = pd.read_excel('/content/supermarket.xlsx')
+excel_file.head()
+
+df = excel_file[['Gender', 'Product line', 'Total']]
+df.head()
+
+report_table = df.pivot_table(index = 'Gender', columns = 'Product line', values = 'Total', aggfunc = 'sum')
+report_table.to_excel('Super_market_report.xlsx',sheet_name = 'Super_market_report')
+
+wb = load_workbook('Super_market_report.xlsx')
+sheet = wb['Super_market_report']
+# cell references (original spreadsheet)
+min_column = wb.active.min_column
+max_column = wb.active.max_column
+min_row = wb.active.min_row
+max_row = wb.active.max_row
+# adding a chart
+barchart = BarChart()
+data = Reference(sheet, min_col=min_column+1, max_col=max_column, min_row=min_row, max_row=max_row) #including headers
+categories = Reference(sheet, min_col=min_column, max_col=min_column, min_row=min_row+1, max_row=max_row) #not including headers
+barchart.add_data(data, titles_from_data=True)
+barchart.set_categories(categories)
+sheet.add_chart(barchart, "B12") #location chart
+barchart.title = 'Sales by Product line'
+barchart.style = 2 #choose the chart style
