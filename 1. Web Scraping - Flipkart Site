@@ -1,0 +1,26 @@
+from bs4 import BeautifulSoup
+import requests
+import pandas as pd
+
+res = requests.get('https://www.flipkart.com/search?q=laptop&sid=6bo%2Cb5g&as=on&as-show=on&otracker=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_na&otracker1=AS_QueryStore_OrganicAutoSuggest_1_3_na_na_na&as-pos=1&as-type=RECENT&suggestionId=laptop%7CLaptops&requestId=14c8d722-0307-4a83-a3d7-dfbb048f0ae8&as-backfill=on')
+
+products = []
+prices = []
+ratings = []
+
+soup = BeautifulSoup(res.content, 'html.parser')
+title = soup.title.text
+
+for a in soup.findAll('a',href=True, attrs={'class':'_1fQZEK'}):
+  name=a.find('div', attrs={'class':'_4rR01T'})
+  price=a.find('div', attrs={'class':'_30jeq3 _1_WHN1'})
+  rating=a.find('div', attrs={'class':'_3LWZlK'})
+  products.append(name.text)
+  prices.append(price.text)
+  ratings.append(rating.text)
+
+df = pd.DataFrame({'Product Name':products, 'Price':prices, 'Ratings':ratings})
+
+df.to_csv('Laptops from Filpkart.csv', index=False, encoding='utf-8')
+
+df.head()
