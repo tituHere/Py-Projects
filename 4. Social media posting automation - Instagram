@@ -1,0 +1,5 @@
+from instabot import Bot
+
+bot = Bot()
+bot.login(username = 'usrname', password = 'pwd')
+bot.upload_photo(r'/content/nature.jpg', caption = 'Input caption')
