@@ -1,0 +1,63 @@
+import pandas as pd;
+import matplotlib.pyplot as plt;
+import seaborn as sns;
+sns.set_style('dark');
+%matplotlib inline
+
+#movie details dataframe
+df = pd.read_csv(r'/content/Movie_Id_Titles.csv')
+movie_details = df.rename({'item_id':'movieId'}, axis = 1)
+movie_details.head()
+
+#ratings details data frame
+rating_details = pd.read_csv(r'/content/ratings_small.csv')
+rating_details.head(10)
+
+#calculating the mean and count of ratings
+rating_details.groupby('movieId')['rating'].mean().sort_values(ascending = False).head()
+rating_details.groupby('movieId')['rating'].count().sort_values(ascending = False).head()
+
+#merging the two DFs
+movie_df = pd.merge(movie_details, rating_details, on ='movieId')
+movie_df.head()
+
+#framing a new df:
+ratings = pd.DataFrame(movie_df.groupby('title')['rating'].mean())
+#adding one more column to ratings data frame
+
+ratings['No of Ratings'] = pd.DataFrame(movie_df.groupby('title')['rating'].count().sort_values(ascending = False))
+ratings.head()
+
+
+
+#plotting a histogram:
+plt.figure(figsize=(10,4))
+ratings['rating'].hist(bins=70)
+
+#plotting a histogram:
+plt.figure(figsize=(10,4))
+ratings['No of Ratings'].hist(bins=70)
+
+#recommending similar movies:
+pivot_values = movie_df.pivot_table(index = 'userId', columns= 'title', values = 'rating')
+pivot_values.head()
+
+ratings.sort_values('No of Ratings',ascending = False).head()
+
+Client_ratings = pivot_values['Client, The (1994)']
+Client_ratings.head(10)
+
+Client_corr = pivot_values.corrwith(Client_ratings)
+Client_corr.dropna(inplace = True)
+Client_corr.sort_values(ascending = False).head()
+
+#framing a datframe for client movie with the ratings avg and the number of ratings for its correlated movies.
+
+client_rec['Correlation'] = pd.DataFrame(pivot_values.corrwith(Client_ratings).sort_values(ascending = False))
+
+client_rec_df = pd.merge(client_rec,ratings, on = 'title' )
+
+#displaying the rows that have no of ratings >100
+client_rec_df[client_rec_df['No of Ratings']>100].sort_values('Correlation',ascending = False).head()
+
+
